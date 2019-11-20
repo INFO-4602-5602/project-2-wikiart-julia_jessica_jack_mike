@@ -24,22 +24,24 @@ source = ColumnDataSource(data=dict(
 ))
 
 TOOLTIPS = """
-    <div>
+<div>
+    <div float: left; width: 230px;>
         <div>
             <img
                 src="@imgs" height="200" alt="@imgs" width="200"
-                style="float: left; margin: 0px 15px 15px 0px;"
+                style="float: left; margin: 15px 15px 15px 15px;"
                 border="2"
             ></img>
         </div>
         <div>
-            <span style="font-size: 17px; font-weight: bold;">@titles</span>
+            <span style="float: left; margin: 0px 15px 15px 15px; font-size: 17px; width: 200px; font-weight: bold;">@titles</span>
         </div>
         <div>
             <span style="font-size: 15px;">Yeet</span>
             <span style="font-size: 10px; color: #696;">($x, $y)</span>
         </div>
     </div>
+</div>
 """
 
 colors = factor_cmap('style', palette=Spectral6, factors=style.unique())
@@ -47,7 +49,7 @@ colors = factor_cmap('style', palette=Spectral6, factors=style.unique())
 
 
 p = figure(plot_width=1500, plot_height=600, tooltips=TOOLTIPS,
-           title="Test graph please ignore")
+           title="Test graph please ignore", lod_threshold=None)
 
 p.circle('x', 'y', size=6, source=source, fill_color=colors, line_color=colors)
 
