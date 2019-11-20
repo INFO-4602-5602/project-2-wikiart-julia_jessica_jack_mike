@@ -59,6 +59,15 @@ p.circle('x', 'y', size=6, source=source, fill_color=colors, line_color=colors)
 p.xaxis.axis_label = 'Year'
 p.yaxis.axis_label = 'Mean Rating'
 
+p.yaxis.ticker = [-3,-2,-1,0,1,2,3]
+p.yaxis.major_label_overrides = {   3: 'I like it a lot',
+                                    2: 'I like it',
+                                    1: 'I like it somewhat',
+                                    0: 'I am Neutral',
+                                    -1: 'I dislike it somewhat',
+                                    -2: 'I dislike it',
+                                    -3: 'I dislike it a lot',}
+
 p.min_border_left = 100
 p.min_border_right = 100
 p.min_border_top = 200
