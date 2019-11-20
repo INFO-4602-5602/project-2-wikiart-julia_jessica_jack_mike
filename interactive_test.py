@@ -20,6 +20,7 @@ source = ColumnDataSource(data=dict(
     y=test_frame['Mean rating'],
     style=style,
     titles=test_frame['Title'],
+    artists=test_frame['Artist'],
     imgs=test_frame['Image URL'],
 ))
 
@@ -34,11 +35,13 @@ TOOLTIPS = """
             ></img>
         </div>
         <div>
-            <span style="float: left; margin: 0px 15px 15px 15px; font-size: 17px; width: 200px; font-weight: bold;">@titles</span>
+            <span style="float: left; margin: 10px 15px 0px 15px; font-size: 17px; width: 200px; font-weight: bold;">@titles</span>
         </div>
         <div>
-            <span style="font-size: 15px;">Yeet</span>
-            <span style="font-size: 10px; color: #696;">($x, $y)</span>
+            <span style="float: left; margin: 10px 15px 0px 15px; font-size: 15px; width: 200px;">Artist: @artists</span>
+        </div>
+        <div>
+            <span style="float: left; margin: 10px 15px 0px 15px; font-size: 15px; width: 200px;">Year: @x</span>
         </div>
     </div>
 </div>
