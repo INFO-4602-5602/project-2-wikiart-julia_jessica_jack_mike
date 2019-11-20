@@ -7,7 +7,7 @@ from bokeh.palettes import Spectral6
 output_file("scatter.html")
 
 # Load Dataset
-data_frame = pd.read_csv('WikiArtClean.csv')
+data_frame = pd.read_csv('WikiArtClean.csv',encoding='utf_8')
 
 # Grab a few fields from the first 100 paintings as mini test dataset
 # test_frame = data_frame.iloc[:100,:][['Title','Year','Image URL','Mean rating']]
