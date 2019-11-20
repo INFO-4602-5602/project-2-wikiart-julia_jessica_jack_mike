@@ -27,7 +27,7 @@ TOOLTIPS = """
     <div>
         <div>
             <img
-                src="@imgs" height="100" alt="@imgs" width="100"
+                src="@imgs" height="200" alt="@imgs" width="200"
                 style="float: left; margin: 0px 15px 15px 0px;"
                 border="2"
             ></img>
@@ -49,7 +49,7 @@ colors = factor_cmap('style', palette=Spectral6, factors=style.unique())
 p = figure(plot_width=1500, plot_height=600, tooltips=TOOLTIPS,
            title="Test graph please ignore")
 
-p.circle('x', 'y', size=10, source=source, fill_color=colors, line_color=colors)
+p.circle('x', 'y', size=6, source=source, fill_color=colors, line_color=colors)
 
 p.xaxis.axis_label = 'Year'
 p.yaxis.axis_label = 'Mean Rating'
