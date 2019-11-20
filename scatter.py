@@ -30,7 +30,7 @@ TOOLTIPS = """
     <div float: left; width: 230px;>
         <div>
             <img
-                src="@imgs" height="200" alt="@imgs" width="200"
+                src="@imgs" height="200" alt="@imgs"
                 style="float: left; margin: 15px 15px 15px 15px;"
                 border="2"
             ></img>
