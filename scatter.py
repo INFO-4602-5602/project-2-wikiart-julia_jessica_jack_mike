@@ -52,7 +52,8 @@ TOOLTIPS = """
 """
 
 # Generate first plot
-colors1 = factor_cmap('style', palette=Spectral6, factors=style.unique())
+colors1 = factor_cmap('style', palette=['#68affc','#422838','#41bbc5','#9c3b68','#81ba5f','#691b9e'], factors=style.unique())
+#colors1 = ['#68affc','#422838','#41bbc5','#9c3b68','#81ba5f','#691b9e']
 
 p1 = figure(plot_width=1500, plot_height=1000, tooltips=TOOLTIPS,
            title="Test graph please ignore", lod_threshold=None)
