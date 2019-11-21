@@ -12,23 +12,22 @@ output_file("scatter.html")
 # Load Dataset
 data_frame = pd.read_csv('WikiArtClean.csv',encoding='utf_8')
 
-# Grab a few fields from the first 100 paintings as mini test dataset
-# test_frame = data_frame.iloc[:100,:][['Title','Year','Image URL','Mean rating']]
-test_frame = data_frame
+# Grab sub frames for color mapping
+style = data_frame['Style']
+bodyparts = data_frame['Face or body']
 
-style = test_frame['Style']
-bodyparts = test_frame['Face or body']
-
+# Generate ColumnDataSource for plots
 source = ColumnDataSource(data=dict(
     style=style,
-    x=test_frame['Year'],
-    y=test_frame['Mean rating'],
-    titles=test_frame['Title'],
-    artists=test_frame['Artist'],
-    bodyparts=test_frame['Face or body'],
-    imgs=test_frame['Image URL'],
+    x=data_frame['Year'],
+    y=data_frame['Mean rating'],
+    titles=data_frame['Title'],
+    artists=data_frame['Artist'],
+    bodyparts=data_frame['Face or body'],
+    imgs=data_frame['Image URL'],
 ))
 
+# Custom tooltip to display images on hover
 TOOLTIPS = """
 <div>
     <div float: left; width: 230px;>
@@ -52,6 +51,7 @@ TOOLTIPS = """
 </div>
 """
 
+# Generate first plot
 colors1 = factor_cmap('style', palette=Spectral6, factors=style.unique())
 
 p1 = figure(plot_width=1500, plot_height=1000, tooltips=TOOLTIPS,
@@ -82,7 +82,7 @@ p1.legend.location = "bottom_left"
 tab1 = Panel(child=p1, title="style")
 
 
-
+# Generate second plot
 colors2 = factor_cmap('bodyparts', palette=Spectral6, factors=bodyparts.unique())
 
 p2 = figure(plot_width=1500, plot_height=1000, tooltips=TOOLTIPS,
