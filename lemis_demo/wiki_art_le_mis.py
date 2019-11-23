@@ -6,12 +6,26 @@ import pandas as pd
 
 # Load Dataset
 data_frame = pd.read_csv('WikiArtClean.csv')
-things = data_frame.columns[11:].to_list()
+
+# positive only data
+##data_frame = data_frame.loc[data_frame['Mean rating'] > 0.5]
+
+# negative only data
+##data_frame = data_frame.loc[data_frame['Mean rating'] < -0.5]
+
+# neutral/mixed only data
+data_frame = data_frame.loc[data_frame['Mean rating'] > -0.5]
+data_frame = data_frame.loc[data_frame['Mean rating'] < 0.5]
+
+things = data_frame.columns[11:].to_list() # list of the twenty emotions
+# separate the emotions into groups
 pos = ['Gratitude','Happiness','Humility','Love','Optimism','Trust']
 neg = ['Anger','Arrogance','Disgust','Fear','Pessimism','Regret','Sadness', 'Shame']
 other_mixed = ['Agreeableness','Anticipation','Disagreeableness','Shyness','Surprise','Neutral']
+
 cust_things_list = neg + other_mixed + pos
 things = cust_things_list
+
 mat_size = len(things)
 xname = []
 yname = []
@@ -24,6 +38,10 @@ for emot in things:
 - DONE color by the three groups (pos neut neg)
 - weighted sum the occurance
 - cooccurance -- filter, positive mean rating, neg mean rating, all
+-- the filters, just reduce the dataset so it is either > 0.5 "liked",
+< 0.5 "disliked", inbetween "neutral", or all
+^^^ for these filters need to modify the max min vals of the alpha, or need to scale
+by the minimum as well as the maximum
 '''
 OCCUR = 0
 MEANLIKE = 2
@@ -34,6 +52,7 @@ OCcolors_array = pd.DataFrame('#90A7BC', index=range(len(things)), columns=range
 # note this is done for now based on > 0, rather than weighted
 # or other
 
+##emot_max_occur = wiki_vals[:,:,OCCUR].max(0) # need this to be per column
 for row in range(len(things)):
     for col in range(len(things)):
         if col >= row:
@@ -54,8 +73,10 @@ max_mean_like = wiki_vals[:,:,MEANLIKE].max()
 for row in range(len(things)):
     for col in range(len(things)):
         if col >= row:
-            wiki_vals[row, col, OCCUR+1] = max(wiki_vals[row, col, OCCUR]/max_occur,0.1)
-            wiki_vals[row, col, MEANLIKE+1] = max(wiki_vals[row, col, MEANLIKE]/max_mean_like,0.1)
+##            wiki_vals[row, col, OCCUR+1] = max(wiki_vals[row, col, OCCUR]/max_occur,0.1)
+            wiki_vals[row, col, OCCUR+1] = max(wiki_vals[row, col, OCCUR],0.1)
+##            wiki_vals[row, col, MEANLIKE+1] = max(wiki_vals[row, col, MEANLIKE]/max_mean_like,0.1)
+            wiki_vals[row, col, MEANLIKE+1] = max(wiki_vals[row, col, MEANLIKE],0.1)
 
             # colors by group
             if (things[row] in pos) and (things[col] in pos):
@@ -79,14 +100,6 @@ for row in range(len(things)):
                 OCcolors_array.iloc[row, col] = '#90A7BC'
                 OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
 
-##emot_max_occur = wiki_vals[:,:,OCCUR].max(0) # need this to be per column
-##for row in range(len(things)):
-##    for col in range(len(things)):
-##        if col >= row:
-##            wiki_vals[row, col, OCCUR+1] = max(wiki_vals[row, col, OCCUR]/max_occur,0.1)
-####            wiki_vals[row, col, OCCUR+1] = max(wiki_vals[row, col, OCCUR]/max_occur,0.1)
-##            wiki_vals[row, col, MEANLIKE+1] = max(wiki_vals[row, col, MEANLIKE]/max_mean_like,0.1)
-            
 # mirror the matrix
 for dim in range(wiki_vals.shape[2]):
     for col in range(len(things)):
@@ -134,15 +147,15 @@ counts = counts.flatten()
 counts = counts[0:len(xname)]
 
 # occurance
-counts = wiki_vals[:,:,OCCUR].flatten()
-alpha = wiki_vals[:,:,OCCUR+1].flatten()
-##color = OCcolors_array.values.flatten()
-ptitle = 'Emotions --- shaded by co-occurance'
+##counts = wiki_vals[:,:,OCCUR].flatten()
+##alpha = wiki_vals[:,:,OCCUR+1].flatten()
+####color = OCcolors_array.values.flatten()
+##ptitle = 'Emotions --- shaded by co-occurance'
 # mean like
-##counts = wiki_vals[:,:,MEANLIKE].flatten()
-##alpha = wiki_vals[:,:,MEANLIKE+1].flatten()
-####color = MLcolors_array.values.flatten()
-##ptitle = 'Emotions --- shaded by mean like' # need to explain these further
+counts = wiki_vals[:,:,MEANLIKE].flatten()
+alpha = wiki_vals[:,:,MEANLIKE+1].flatten()
+##color = MLcolors_array.values.flatten()
+ptitle = 'Emotions --- shaded by mean like' # need to explain these further
 
 data=dict(
     xname=xname,
