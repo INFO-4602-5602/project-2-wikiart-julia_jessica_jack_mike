@@ -47,7 +47,7 @@ for emot in things:
     yname += things
 
 ## all above is consistent between tabs 
-def gen_data(data_frame_L):
+def gen_data(data_frame_L, Occurance_Not_Mean_Like):
     ########### kind of need to determine if this is the negative data and then shift the center for the alphas to be positive
     OCCUR = 0
     MEANLIKE = 2
@@ -57,8 +57,6 @@ def gen_data(data_frame_L):
     # process and calculate the cooccurances of emotions
     # note this is done for now based on > 0, rather than weighted
     # or other
-
-    ##emot_max_occur = wiki_vals[:,:,OCCUR].max(0) # need this to be per column
     for row in range(len(things)):
         for col in range(len(things)):
             if col >= row:
@@ -74,48 +72,87 @@ def gen_data(data_frame_L):
     ##            wiki_vals[row, col, OCCUR] = weighted_occ
                 wiki_vals[row, col, MEANLIKE] = mean_like
 
-    Single_ramp = True # color scheme
-    ## !! this is where the max occur might need to change to be per column
+    Single_ramp = False # color scheme
+    row_max_occur = wiki_vals[:,:,OCCUR].max(0) # need this to be per column
+    row_min_occur = wiki_vals[:,:,OCCUR].min(0) # need this to be per column
+    row_max_like = wiki_vals[:,:,MEANLIKE].max(0) # need this to be per column
+    row_min_like = wiki_vals[:,:,MEANLIKE].min(0) # need this to be per column
     max_occur = wiki_vals[:,:,OCCUR].max()
-    print(max_occur)
+    min_occur = wiki_vals[:,:,OCCUR].min()
+    print('max occur: ',max_occur)
+    print('min occur: ',min_occur)
     max_mean_like = wiki_vals[:,:,MEANLIKE].max()
-    print(max_mean_like)
+    min_mean_like = wiki_vals[:,:,MEANLIKE].min()
+    print('max like: ',max_mean_like)
+    print('min like: ',min_mean_like)
     for row in range(len(things)):
         for col in range(len(things)):
             if col >= row:
                 # alpha vals
-                # abs val this?
-                wiki_vals[row, col, OCCUR+1] = max(wiki_vals[row, col, OCCUR]/max_occur,0.1)
+                # no normalization
 ##                wiki_vals[row, col, OCCUR+1] = max(wiki_vals[row, col, OCCUR],0.1)
-                wiki_vals[row, col, MEANLIKE+1] = max(wiki_vals[row, col, MEANLIKE]/max_mean_like,0.1)
 ##                wiki_vals[row, col, MEANLIKE+1] = max(wiki_vals[row, col, MEANLIKE],0.1)
 
+                # full matrix normalization
+##                wiki_vals[row, col, OCCUR+1] = max((wiki_vals[row, col, OCCUR]+abs(min_occur))/(max_occur-min_occur),0.1)
+##                wiki_vals[row, col, MEANLIKE+1] = max((wiki_vals[row, col, MEANLIKE]+abs(min_mean_like))/(max_mean_like-min_mean_like),0.1)
+
+                # by row normalization
+                wiki_vals[row, col, OCCUR+1] = max((wiki_vals[row, col, OCCUR]+abs(row_min_occur[col]))/(row_max_occur[col]-row_min_occur[col]),0.1)
+                wiki_vals[row, col, MEANLIKE+1] = max((wiki_vals[row, col, MEANLIKE]+abs(min_mean_like))/(max_mean_like-min_mean_like),0.1)
+
                 
+                Single_color = '#691b9e' # darkish purple
+                
+                Multi_positive = '#066303' # darkish green
+                Multi_negative = '#a80002'# darkish red
+                Multi_neutral = '#1f5f94' # darkish light blue
+
+                pos_and_neg = '#4B3903' # red and green blend
+                pos_and_neut = '#146156' # green and blue blend
+                neut_and_neg = '#5A3655' # red and blue blend
+                
+                not_used = '#90A7BC' # light blue gray
                 if Single_ramp: # colors in single ramp
-                    MLcolors_array.iloc[row, col] = '#a6cee3'
+                    MLcolors_array.iloc[row, col] = Single_color
                     MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
-                    OCcolors_array.iloc[row, col] = '#a6cee3'
+                    OCcolors_array.iloc[row, col] = Single_color
                     OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
                 else: # colors by group
                     if (things[row] in pos) and (things[col] in pos):
-                        MLcolors_array.iloc[row, col] = '#4daf4a'
+                        MLcolors_array.iloc[row, col] = Multi_positive
                         MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
-                        OCcolors_array.iloc[row, col] = '#4daf4a'
+                        OCcolors_array.iloc[row, col] = Multi_positive
                         OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
                     elif (things[row] in neg) and (things[col] in neg):
-                        MLcolors_array.iloc[row, col] = '#e41a1c'
+                        MLcolors_array.iloc[row, col] = Multi_negative
                         MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
-                        OCcolors_array.iloc[row, col] = '#e41a1c'
+                        OCcolors_array.iloc[row, col] = Multi_negative
                         OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
                     elif (things[row] in other_mixed) and (things[col] in other_mixed):
-                        MLcolors_array.iloc[row, col] = '#377eb8'
+                        MLcolors_array.iloc[row, col] = Multi_neutral
                         MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
-                        OCcolors_array.iloc[row, col] = '#377eb8'
+                        OCcolors_array.iloc[row, col] = Multi_neutral
                         OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
-                    else:
-                        MLcolors_array.iloc[row, col] = '#90A7BC'
+                    elif (things[row] in pos) and (things[col] in neg):
+                        MLcolors_array.iloc[row, col] = pos_and_neg
                         MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
-                        OCcolors_array.iloc[row, col] = '#90A7BC'
+                        OCcolors_array.iloc[row, col] = pos_and_neg
+                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
+                    elif (things[row] in pos) and (things[col] in other_mixed):
+                        MLcolors_array.iloc[row, col] = pos_and_neut
+                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
+                        OCcolors_array.iloc[row, col] = pos_and_neut
+                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
+                    elif (things[row] in neg) and (things[col] in other_mixed):
+                        MLcolors_array.iloc[row, col] = neut_and_neg
+                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
+                        OCcolors_array.iloc[row, col] = neut_and_neg
+                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror   
+                    else:
+                        MLcolors_array.iloc[row, col] = not_used
+                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
+                        OCcolors_array.iloc[row, col] = not_used
                         OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
 
     # mirror the matrix
@@ -127,16 +164,18 @@ def gen_data(data_frame_L):
                 if row != col and row > col:
                         wiki_vals[row,col,dim] = wiki_vals[col,row,dim]
 
-    # occurance
-    counts = wiki_vals[:,:,OCCUR].flatten()
-    alpha = wiki_vals[:,:,OCCUR+1].flatten()
-    color = OCcolors_array.values.flatten()
-    ptitle = 'Emotions --- shaded by co-occurance'
-    # mean like
-##    counts = wiki_vals[:,:,MEANLIKE].flatten()
-##    alpha = wiki_vals[:,:,MEANLIKE+1].flatten()
-##    color = MLcolors_array.values.flatten()
-##    ptitle = 'Emotions --- shaded by mean like' # need to explain these further
+    if Occurance_Not_Mean_Like:
+        # occurance
+        counts = wiki_vals[:,:,OCCUR].flatten()
+        alpha = wiki_vals[:,:,OCCUR+1].flatten()
+        color = OCcolors_array.values.flatten()
+        ptitle = 'Emotions --- shaded by co-occurance'
+    else:
+        # mean like
+        counts = wiki_vals[:,:,MEANLIKE].flatten()
+        alpha = wiki_vals[:,:,MEANLIKE+1].flatten()
+        color = MLcolors_array.values.flatten()
+        ptitle = 'Emotions --- shaded by mean like' # need to explain these further
 
     data=dict(
         xname=xname,
@@ -148,9 +187,12 @@ def gen_data(data_frame_L):
 
     return data
 
+Occurance_Not_Mean_Like = True
 # ---------- generate plot for ALL data
-p1_data = gen_data(all_data_frame)
-p1title = 'Emotions --- shaded by co-occurance -- All data'
+p1_data = gen_data(all_data_frame, Occurance_Not_Mean_Like)
+if Occurance_Not_Mean_Like: p1title = 'Emotions --- shaded by co-occurance -- All data'
+else: p1title = 'Emotions --- shaded by mean like -- All data'
+
 # generate the first plot tab
 p1 = figure(title=p1title,
            x_axis_location="above", tools="hover,save",
@@ -172,8 +214,10 @@ p1.rect('xname', 'yname', 0.9, 0.9, source=p1_data,
 tab1 = Panel(child=p1, title="All - Art")
 
 # ---------- generate plot for Positive data
-p2_data = gen_data(pos_data_frame)
-p2title = 'Emotions --- shaded by co-occurance -- Positive data'
+p2_data = gen_data(pos_data_frame, Occurance_Not_Mean_Like)
+if Occurance_Not_Mean_Like: p2title = 'Emotions --- shaded by co-occurance -- Positive data'
+else: p2title = 'Emotions --- shaded by mean like -- Positive data'
+
 # generate the first plot tab
 p2 = figure(title=p2title,
            x_axis_location="above", tools="hover,save",
@@ -194,8 +238,9 @@ p2.rect('xname', 'yname', 0.9, 0.9, source=p2_data,
 
 tab2 = Panel(child=p2, title="Positive - Art")
 # ---------- generate plot for Neutral/mixed data
-p3_data = gen_data(neut_data_frame)
-p3title = 'Emotions --- shaded by co-occurance -- Neutral/mixed data'
+p3_data = gen_data(neut_data_frame, Occurance_Not_Mean_Like)
+if Occurance_Not_Mean_Like: p3title = 'Emotions --- shaded by co-occurance -- Neutral/mixed data'
+else: p3title = 'Emotions --- shaded by mean like -- Neutral/mixed data'
 # generate the first plot tab
 p3 = figure(title=p3title,
            x_axis_location="above", tools="hover,save",
@@ -216,8 +261,9 @@ p3.rect('xname', 'yname', 0.9, 0.9, source=p3_data,
 
 tab3 = Panel(child=p3, title="Neutral/mixed - Art")
 # ---------- generate plot for Negative data
-p4_data = gen_data(neg_data_frame)
-p4title = 'Emotions --- shaded by co-occurance -- Negative data'
+p4_data = gen_data(neg_data_frame, Occurance_Not_Mean_Like)
+if Occurance_Not_Mean_Like: p4title = 'Emotions --- shaded by co-occurance -- Negative data'
+else: p4title = 'Emotions --- shaded by mean like -- Negative data'
 # generate the first plot tab
 p4 = figure(title=p4title,
            x_axis_location="above", tools="hover,save",
