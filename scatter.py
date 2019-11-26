@@ -52,7 +52,7 @@ TOOLTIPS = """
 """
 
 # Generate first plot
-colors1 = factor_cmap('style', palette=['#68affc','#81ba5f','#41bbc5','#9c3b68','#422838','#691b9e'], factors=style.unique())
+colors1 = factor_cmap('style', palette=['#68affc','#81ba5f','#41bbc5','#9c3b68','#9c3b68','#691b9e'], factors=style.unique())
 #colors1 = ['#68affc','#422838','#41bbc5','#9c3b68','#81ba5f','#691b9e']
 
 p1 = figure(plot_width=1500, plot_height=1000, tooltips=TOOLTIPS,
@@ -79,12 +79,13 @@ p1.min_border_top = 200
 p1.min_border_bottom = 200
 
 p1.legend.location = "bottom_left"
+p1.title.text_font_size = '20pt'
 
 tab1 = Panel(child=p1, title="style")
 
 
 # Generate second plot
-colors2 = factor_cmap('bodyparts', palette=['#ffc428','#bd0026','#a1d99b'], factors=bodyparts.unique())
+colors2 = factor_cmap('bodyparts', palette=['#ffc428','#bd0026','#46bdb3'], factors=bodyparts.unique())
 
 p2 = figure(plot_width=1500, plot_height=1000, tooltips=TOOLTIPS,
            title="Test graph please ignore", lod_threshold=None)
@@ -110,6 +111,7 @@ p2.min_border_top = 200
 p2.min_border_bottom = 200
 
 p2.legend.location = "bottom_left"
+p2.title.text_font_size = '20pt'
 
 tab2 = Panel(child=p2, title="bodyparts")
 
