@@ -81,7 +81,7 @@ p1.min_border_bottom = 200
 p1.legend.location = "bottom_left"
 p1.title.text_font_size = '20pt'
 
-tab1 = Panel(child=p1, title="style")
+tab1 = Panel(child=p1, title="By Art Style")
 
 
 # Generate second plot
@@ -113,7 +113,7 @@ p2.min_border_bottom = 200
 p2.legend.location = "bottom_left"
 p2.title.text_font_size = '20pt'
 
-tab2 = Panel(child=p2, title="bodyparts")
+tab2 = Panel(child=p2, title="By What's Depicted")
 
 tabs = Tabs(tabs=[ tab1, tab2 ])
 
