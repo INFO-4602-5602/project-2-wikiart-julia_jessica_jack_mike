@@ -24,7 +24,7 @@ and count to "Number of Paintings"
 '''
 
 # Load Dataset
-all_data_frame = pd.read_csv('WikiArtClean.csv') # leave for all
+all_data_frame = pd.read_csv('../WikiArtClean.csv') # leave for all
 
 # positive only data
 pos_data_frame = all_data_frame.loc[all_data_frame['Mean rating'] > 0.5]
@@ -63,8 +63,8 @@ pos_and_neut = '#146156' # green and blue blend
 neut_and_neg = '#5A3655' # red and blue blend
 
 not_used = '#90A7BC' # light blue gray
-                
-## all above is consistent between tabs 
+
+## all above is consistent between tabs
 def gen_data(data_frame_L, Occurance_Not_Mean_Like):
     OCCUR = 0
     MEANLIKE = 2
@@ -82,18 +82,18 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
 
                 norm_count = len(data_frame_L[(data_frame_L[things[row]]>0)])
                 weighted_occ = 2.5/norm_count*(data_frame_L[things[row]].to_numpy()@data_frame_L[things[col]].to_numpy())
-                
+
                 mean_like = temp['Mean rating'].mean() # average agreeableness
-                
+
                 wiki_vals[row, col, OCCUR] = occurance
     ##            wiki_vals[row, col, OCCUR] = weighted_occ
                 wiki_vals[row, col, MEANLIKE] = mean_like
 
     Single_ramp = False # color scheme
     row_max_occur = wiki_vals[:,:,OCCUR].max(0) # per column
-    row_min_occur = wiki_vals[:,:,OCCUR].min(0) 
-    row_max_like = wiki_vals[:,:,MEANLIKE].max(0) 
-    row_min_like = wiki_vals[:,:,MEANLIKE].min(0) 
+    row_min_occur = wiki_vals[:,:,OCCUR].min(0)
+    row_max_like = wiki_vals[:,:,MEANLIKE].max(0)
+    row_min_like = wiki_vals[:,:,MEANLIKE].min(0)
     max_occur = wiki_vals[:,:,OCCUR].max()
     min_occur = wiki_vals[:,:,OCCUR].min()
 ##    print('max occur: ',max_occur)
@@ -121,8 +121,8 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
                 if row == col: # blank out the diagonal
                     wiki_vals[row, col, OCCUR+1] = 1.0
                     wiki_vals[row, col, MEANLIKE+1] = 1.0
-                
-                
+
+
                 if Single_ramp: # colors in single ramp
                     MLcolors_array.iloc[row, col] = Single_color
                     MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
@@ -158,7 +158,7 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
 ##                        MLcolors_array.iloc[row, col] = neut_and_neg
 ##                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
 ##                        OCcolors_array.iloc[row, col] = neut_and_neg
-##                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror   
+##                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
                     else:
                         MLcolors_array.iloc[row, col] = not_used
                         MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
@@ -166,7 +166,7 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
                         OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
                 if row == col:
                     MLcolors_array.iloc[row, col] = '#F1F1F1'
-                    OCcolors_array.iloc[row, col] = '#F1F1F1'          
+                    OCcolors_array.iloc[row, col] = '#F1F1F1'
 
     # mirror the matrix
     for dim in range(wiki_vals.shape[2]):
@@ -202,6 +202,10 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
 
 tabs_not_grid = True
 Occurance_Not_Mean_Like = True
+
+names = ["Positive","Neutral","Negative","Combination"," ","Saturation key","High co-occurance","Medium co-occurance","Low co-occurance"]
+colors = [Multi_positive,Multi_neutral,Multi_negative,not_used,'#FFFFFF','#FFFFFF','#046301','#498046','#6d806c']
+
 # ---------- generate plot for ALL data
 p1_data = gen_data(all_data_frame, Occurance_Not_Mean_Like)
 if Occurance_Not_Mean_Like: p1title = 'Emotions --- shaded by co-occurance -- Showing all Art'
@@ -211,7 +215,7 @@ else: p1title = 'Emotions --- shaded by mean like -- All data'
 # generate the first plot tab
 p1 = figure(title=p1title,
            x_axis_location="above", tools="hover,save",
-           x_range=list(reversed(things)), y_range=things, 
+           x_range=list(reversed(things)), y_range=things,
            tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
 p1.plot_width = 1000
 p1.plot_height = 800
@@ -222,7 +226,7 @@ p1.axis.major_label_text_font_size = "12pt"
 p1.axis.major_label_standoff = 0
 p1.xaxis.major_label_orientation = np.pi/3
 p1.title.text_font_size = '12pt'
-                
+
 legend_items = []
 names = ["Positive","Neutral","Negative","Combination"," ","Saturation key","High co-occurance","Medium co-occurance","Low co-occurance"]
 colors = [Multi_positive,Multi_neutral,Multi_negative,not_used,'#FFFFFF','#FFFFFF','#046301','#498046','#6d806c']
@@ -230,7 +234,7 @@ colors = [Multi_positive,Multi_neutral,Multi_negative,not_used,'#FFFFFF','#FFFFF
 
 
 
-p1.rect('xname', 'yname', 0.9, 0.9, source=p1_data, 
+p1.rect('xname', 'yname', 0.9, 0.9, source=p1_data,
        color='colors', alpha='alphas', line_color=None,
        hover_line_color='black', hover_color='colors')
 
@@ -251,7 +255,7 @@ p2 = figure(title=p2title,
            x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
            tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
-p2.plot_width = 800
+p2.plot_width = 1000
 p2.plot_height = 800
 p2.grid.grid_line_color = None
 p2.axis.axis_line_color = None
@@ -267,9 +271,10 @@ p2.rect('xname', 'yname', 0.9, 0.9, source=p2_data,
        color='colors', alpha='alphas', line_color=None,
        hover_line_color='black', hover_color='colors')
 
-##for i in range(9):
-##    legend_items += [(names[i],[p2.rect(0,0,width=0,height=0,color=colors[i])])]
-##p2.add_layout(Legend(items=legend_items),'right')
+legend_items = []
+for i in range(9):
+    legend_items += [(names[i],[p2.rect(0,0,width=0,height=0,color=colors[i])])]
+p2.add_layout(Legend(items=legend_items),'right')
 
 
 if tabs_not_grid: tab2 = Panel(child=p2, title="Liked Art")
@@ -283,7 +288,7 @@ p3 = figure(title=p3title,
            x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
            tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
-p3.plot_width = 800
+p3.plot_width = 1000
 p3.plot_height = 800
 p3.grid.grid_line_color = None
 p3.axis.axis_line_color = None
@@ -293,9 +298,10 @@ p3.axis.major_label_standoff = 0
 p3.xaxis.major_label_orientation = np.pi/3
 p3.title.text_font_size = '12pt'
 
-##for i in range(9):
-##    legend_items += [(names[i],[p3.rect(0,0,width=0,height=0,color=colors[i])])]
-##p3.add_layout(Legend(items=legend_items),'right')
+legend_items = []
+for i in range(9):
+    legend_items += [(names[i],[p3.rect(0,0,width=0,height=0,color=colors[i])])]
+p3.add_layout(Legend(items=legend_items),'right')
 
 
 p3.rect('xname', 'yname', 0.9, 0.9, source=p3_data,
@@ -313,7 +319,7 @@ p4 = figure(title=p4title,
            x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
            tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
-p4.plot_width = 800
+p4.plot_width = 1000
 p4.plot_height = 800
 p4.grid.grid_line_color = None
 p4.axis.axis_line_color = None
@@ -323,9 +329,10 @@ p4.axis.major_label_standoff = 0
 p4.xaxis.major_label_orientation = np.pi/3
 p4.title.text_font_size = '12pt'
 
-##for i in range(9):
-##    legend_items += [(names[i],[p4.rect(0,0,width=0,height=0,color=colors[i])])]
-##p4.add_layout(Legend(items=legend_items),'right')
+legend_items = []
+for i in range(9):
+    legend_items += [(names[i],[p4.rect(0,0,width=0,height=0,color=colors[i])])]
+p4.add_layout(Legend(items=legend_items),'right')
 
 p4.rect('xname', 'yname', 0.9, 0.9, source=p4_data,
        color='colors', alpha='alphas', line_color=None,
@@ -340,8 +347,7 @@ output_file("wiki_artles_mis.html", title="wiki art example")
 
 if tabs_not_grid:
     tabs = Tabs(tabs=[ tab1, tab2, tab3, tab4])
+    #tabs.add_layout(Legend(items=legend_items),'right')
     show(tabs)
 else:
     show(column(row(p1,p3), row(p2,p4)))
-
-
