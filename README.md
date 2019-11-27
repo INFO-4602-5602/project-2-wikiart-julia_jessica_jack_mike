@@ -12,7 +12,7 @@ Title: The Likeability of Art across Time, Style and Subject Matter
 [Scatterplot](https://info-4602-5602.github.io/project-2-wikiart-julia_jessica_jack_mike/scatter.html)
 
 Title: Exploring the Relationship Between Emotions and Likeability 
-[Adjacency Matrix](https://info-4602-5602.github.io/project-2-wikiart-julia_jessica_jack_mike/lemis_demo/wiki_art_emotions_adjacency.html)
+[Adjacency Matrix](https://info-4602-5602.github.io/project-2-wikiart-julia_jessica_jack_mike/wiki_art_emotions_adjacency.html)
 
 <h2>Team Roles </h2>
 Mike: Designer/coder<br>
