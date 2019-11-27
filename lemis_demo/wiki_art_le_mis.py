@@ -1,20 +1,26 @@
 import numpy as np
-
 from bokeh.plotting import figure, show, output_file
 from bokeh.sampledata.les_mis import data
 import pandas as pd
 from bokeh.models.widgets import Panel, Tabs
+from bokeh.models import (Legend, LegendItem)
+from bokeh.layouts import column, row
 
+'''
+Citations:
+This was the initial code example we worked off of: https://docs.bokeh.org/en/latest/docs/gallery/les_mis.html
+'''
 
 ## my notes on what's up next
 '''
-- DONE color by the three groups (pos neut neg)
-- weighted sum the occurance
-- cooccurance -- filter, positive mean rating, neg mean rating, all
--- the filters, just reduce the dataset so it is either > 0.5 "liked",
-< 0.5 "disliked", inbetween "neutral", or all
-^^^ for these filters need to modify the max min vals of the alpha, or need to scale
-by the minimum as well as the maximum
+- color legends, one for hue and one for intensity
+- DONE center vals should be blank
+- DONE Title
+- DONE tab names: Liked and Disliked
+- DONE 3 color scheme
+- DONE tool tip, change name to "Co-occurring Emotions"
+and count to "Number of Paintings"
+- DONE add a citation in the code
 '''
 
 # Load Dataset
@@ -46,9 +52,20 @@ for emot in things:
     xname += [emot]*mat_size
     yname += things
 
+Single_color = '#691b9e' # darkish purple
+
+Multi_positive = '#066303' # darkish green
+Multi_negative = '#a80002'# darkish red
+Multi_neutral = '#1f5f94' # darkish light blue
+
+pos_and_neg = '#4B3903' # red and green blend
+pos_and_neut = '#146156' # green and blue blend
+neut_and_neg = '#5A3655' # red and blue blend
+
+not_used = '#90A7BC' # light blue gray
+                
 ## all above is consistent between tabs 
 def gen_data(data_frame_L, Occurance_Not_Mean_Like):
-    ########### kind of need to determine if this is the negative data and then shift the center for the alphas to be positive
     OCCUR = 0
     MEANLIKE = 2
     wiki_vals = np.zeros((len(things),len(things),4))
@@ -72,23 +89,23 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
     ##            wiki_vals[row, col, OCCUR] = weighted_occ
                 wiki_vals[row, col, MEANLIKE] = mean_like
 
-    Single_ramp = False # color scheme
-    row_max_occur = wiki_vals[:,:,OCCUR].max(0) # need this to be per column
-    row_min_occur = wiki_vals[:,:,OCCUR].min(0) # need this to be per column
-    row_max_like = wiki_vals[:,:,MEANLIKE].max(0) # need this to be per column
-    row_min_like = wiki_vals[:,:,MEANLIKE].min(0) # need this to be per column
+    Single_ramp = True # color scheme
+    row_max_occur = wiki_vals[:,:,OCCUR].max(0) # per column
+    row_min_occur = wiki_vals[:,:,OCCUR].min(0) 
+    row_max_like = wiki_vals[:,:,MEANLIKE].max(0) 
+    row_min_like = wiki_vals[:,:,MEANLIKE].min(0) 
     max_occur = wiki_vals[:,:,OCCUR].max()
     min_occur = wiki_vals[:,:,OCCUR].min()
-    print('max occur: ',max_occur)
-    print('min occur: ',min_occur)
+##    print('max occur: ',max_occur)
+##    print('min occur: ',min_occur)
     max_mean_like = wiki_vals[:,:,MEANLIKE].max()
     min_mean_like = wiki_vals[:,:,MEANLIKE].min()
-    print('max like: ',max_mean_like)
-    print('min like: ',min_mean_like)
+##    print('max like: ',max_mean_like)
+##    print('min like: ',min_mean_like)
     for row in range(len(things)):
         for col in range(len(things)):
             if col >= row:
-                # alpha vals
+                # alpha values
                 # no normalization
 ##                wiki_vals[row, col, OCCUR+1] = max(wiki_vals[row, col, OCCUR],0.1)
 ##                wiki_vals[row, col, MEANLIKE+1] = max(wiki_vals[row, col, MEANLIKE],0.1)
@@ -101,18 +118,11 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
                 wiki_vals[row, col, OCCUR+1] = max((wiki_vals[row, col, OCCUR]+abs(row_min_occur[col]))/(row_max_occur[col]-row_min_occur[col]),0.1)
                 wiki_vals[row, col, MEANLIKE+1] = max((wiki_vals[row, col, MEANLIKE]+abs(min_mean_like))/(max_mean_like-min_mean_like),0.1)
 
+                if row == col: # blank out the diagonal
+                    wiki_vals[row, col, OCCUR+1] = 1.0
+                    wiki_vals[row, col, MEANLIKE+1] = 1.0
                 
-                Single_color = '#691b9e' # darkish purple
                 
-                Multi_positive = '#066303' # darkish green
-                Multi_negative = '#a80002'# darkish red
-                Multi_neutral = '#1f5f94' # darkish light blue
-
-                pos_and_neg = '#4B3903' # red and green blend
-                pos_and_neut = '#146156' # green and blue blend
-                neut_and_neg = '#5A3655' # red and blue blend
-                
-                not_used = '#90A7BC' # light blue gray
                 if Single_ramp: # colors in single ramp
                     MLcolors_array.iloc[row, col] = Single_color
                     MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
@@ -134,26 +144,29 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
                         MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
                         OCcolors_array.iloc[row, col] = Multi_neutral
                         OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
-                    elif (things[row] in pos) and (things[col] in neg):
-                        MLcolors_array.iloc[row, col] = pos_and_neg
-                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
-                        OCcolors_array.iloc[row, col] = pos_and_neg
-                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
-                    elif (things[row] in pos) and (things[col] in other_mixed):
-                        MLcolors_array.iloc[row, col] = pos_and_neut
-                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
-                        OCcolors_array.iloc[row, col] = pos_and_neut
-                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
-                    elif (things[row] in neg) and (things[col] in other_mixed):
-                        MLcolors_array.iloc[row, col] = neut_and_neg
-                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
-                        OCcolors_array.iloc[row, col] = neut_and_neg
-                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror   
+##                    elif (things[row] in pos) and (things[col] in neg):
+##                        MLcolors_array.iloc[row, col] = pos_and_neg
+##                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
+##                        OCcolors_array.iloc[row, col] = pos_and_neg
+##                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
+##                    elif (things[row] in pos) and (things[col] in other_mixed):
+##                        MLcolors_array.iloc[row, col] = pos_and_neut
+##                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
+##                        OCcolors_array.iloc[row, col] = pos_and_neut
+##                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
+##                    elif (things[row] in neg) and (things[col] in other_mixed):
+##                        MLcolors_array.iloc[row, col] = neut_and_neg
+##                        MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
+##                        OCcolors_array.iloc[row, col] = neut_and_neg
+##                        OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror   
                     else:
                         MLcolors_array.iloc[row, col] = not_used
                         MLcolors_array.iloc[col, row] = MLcolors_array.iloc[row, col] # mirror
                         OCcolors_array.iloc[row, col] = not_used
                         OCcolors_array.iloc[col, row] = OCcolors_array.iloc[row, col] # mirror
+                if row == col:
+                    MLcolors_array.iloc[row, col] = '#F1F1F1'
+                    OCcolors_array.iloc[row, col] = '#F1F1F1'          
 
     # mirror the matrix
     for dim in range(wiki_vals.shape[2]):
@@ -187,113 +200,148 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
 
     return data
 
+tabs_not_grid = False
 Occurance_Not_Mean_Like = True
 # ---------- generate plot for ALL data
 p1_data = gen_data(all_data_frame, Occurance_Not_Mean_Like)
-if Occurance_Not_Mean_Like: p1title = 'Emotions --- shaded by co-occurance -- All data'
+if Occurance_Not_Mean_Like: p1title = 'Emotions --- shaded by co-occurance -- Showing all Art'
 else: p1title = 'Emotions --- shaded by mean like -- All data'
+
 
 # generate the first plot tab
 p1 = figure(title=p1title,
            x_axis_location="above", tools="hover,save",
-           x_range=list(reversed(things)), y_range=things,
-           tooltips = [('names', '@yname, @xname'), ('count', '@count')])
-p1.plot_width = 800
+           x_range=list(reversed(things)), y_range=things, 
+           tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
+p1.plot_width = 1000
 p1.plot_height = 800
 p1.grid.grid_line_color = None
 p1.axis.axis_line_color = None
 p1.axis.major_tick_line_color = None
-p1.axis.major_label_text_font_size = "10pt"
+p1.axis.major_label_text_font_size = "12pt"
 p1.axis.major_label_standoff = 0
 p1.xaxis.major_label_orientation = np.pi/3
+p1.title.text_font_size = '12pt'
+                
+legend_items = []
+names = ["Positive","Neutral","Negative","Combination"," ","Saturation key","High co-occurance","Medium co-occurance","Low co-occurance"]
+colors = [Multi_positive,Multi_neutral,Multi_negative,not_used,'#FFFFFF','#FFFFFF','#046301','#498046','#6d806c']
 
-p1.rect('xname', 'yname', 0.9, 0.9, source=p1_data,
+
+
+
+p1.rect('xname', 'yname', 0.9, 0.9, source=p1_data, 
        color='colors', alpha='alphas', line_color=None,
        hover_line_color='black', hover_color='colors')
 
-tab1 = Panel(child=p1, title="All - Art")
+for i in range(9):
+    legend_items += [(names[i],[p1.rect(0,0,width=0,height=0,color=colors[i])])]
+p1.add_layout(Legend(items=legend_items),'right')
+
+
+if tabs_not_grid: tab1 = Panel(child=p1, title="All Art")
 
 # ---------- generate plot for Positive data
 p2_data = gen_data(pos_data_frame, Occurance_Not_Mean_Like)
-if Occurance_Not_Mean_Like: p2title = 'Emotions --- shaded by co-occurance -- Positive data'
+if Occurance_Not_Mean_Like: p2title = 'Emotions --- shaded by co-occurance -- Filtered by only liked Art'
 else: p2title = 'Emotions --- shaded by mean like -- Positive data'
 
 # generate the first plot tab
 p2 = figure(title=p2title,
            x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
-           tooltips = [('names', '@yname, @xname'), ('count', '@count')])
+           tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
 p2.plot_width = 800
 p2.plot_height = 800
 p2.grid.grid_line_color = None
 p2.axis.axis_line_color = None
 p2.axis.major_tick_line_color = None
-p2.axis.major_label_text_font_size = "10pt"
+p2.axis.major_label_text_font_size = "12pt"
 p2.axis.major_label_standoff = 0
 p2.xaxis.major_label_orientation = np.pi/3
+p2.title.text_font_size = '12pt'
+
+
 
 p2.rect('xname', 'yname', 0.9, 0.9, source=p2_data,
        color='colors', alpha='alphas', line_color=None,
        hover_line_color='black', hover_color='colors')
 
-tab2 = Panel(child=p2, title="Positive - Art")
+##for i in range(9):
+##    legend_items += [(names[i],[p2.rect(0,0,width=0,height=0,color=colors[i])])]
+##p2.add_layout(Legend(items=legend_items),'right')
+
+
+if tabs_not_grid: tab2 = Panel(child=p2, title="Liked Art")
+
 # ---------- generate plot for Neutral/mixed data
 p3_data = gen_data(neut_data_frame, Occurance_Not_Mean_Like)
-if Occurance_Not_Mean_Like: p3title = 'Emotions --- shaded by co-occurance -- Neutral/mixed data'
+if Occurance_Not_Mean_Like: p3title = 'Emotions --- shaded by co-occurance -- Filtered by only neutral/mixed Art'
 else: p3title = 'Emotions --- shaded by mean like -- Neutral/mixed data'
 # generate the first plot tab
 p3 = figure(title=p3title,
            x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
-           tooltips = [('names', '@yname, @xname'), ('count', '@count')])
+           tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
 p3.plot_width = 800
 p3.plot_height = 800
 p3.grid.grid_line_color = None
 p3.axis.axis_line_color = None
 p3.axis.major_tick_line_color = None
-p3.axis.major_label_text_font_size = "10pt"
+p3.axis.major_label_text_font_size = "12pt"
 p3.axis.major_label_standoff = 0
 p3.xaxis.major_label_orientation = np.pi/3
+p3.title.text_font_size = '12pt'
+
+##for i in range(9):
+##    legend_items += [(names[i],[p3.rect(0,0,width=0,height=0,color=colors[i])])]
+##p3.add_layout(Legend(items=legend_items),'right')
+
 
 p3.rect('xname', 'yname', 0.9, 0.9, source=p3_data,
        color='colors', alpha='alphas', line_color=None,
        hover_line_color='black', hover_color='colors')
 
-tab3 = Panel(child=p3, title="Neutral/mixed - Art")
+if tabs_not_grid: tab3 = Panel(child=p3, title="Neutral/Mixed Art")
+
 # ---------- generate plot for Negative data
 p4_data = gen_data(neg_data_frame, Occurance_Not_Mean_Like)
-if Occurance_Not_Mean_Like: p4title = 'Emotions --- shaded by co-occurance -- Negative data'
+if Occurance_Not_Mean_Like: p4title = 'Emotions --- shaded by co-occurance -- Filtered by only disliked Art'
 else: p4title = 'Emotions --- shaded by mean like -- Negative data'
 # generate the first plot tab
 p4 = figure(title=p4title,
            x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
-           tooltips = [('names', '@yname, @xname'), ('count', '@count')])
+           tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
 p4.plot_width = 800
 p4.plot_height = 800
 p4.grid.grid_line_color = None
 p4.axis.axis_line_color = None
 p4.axis.major_tick_line_color = None
-p4.axis.major_label_text_font_size = "10pt"
+p4.axis.major_label_text_font_size = "12pt"
 p4.axis.major_label_standoff = 0
 p4.xaxis.major_label_orientation = np.pi/3
+p4.title.text_font_size = '12pt'
+
+##for i in range(9):
+##    legend_items += [(names[i],[p4.rect(0,0,width=0,height=0,color=colors[i])])]
+##p4.add_layout(Legend(items=legend_items),'right')
 
 p4.rect('xname', 'yname', 0.9, 0.9, source=p4_data,
        color='colors', alpha='alphas', line_color=None,
        hover_line_color='black', hover_color='colors')
 
-tab4 = Panel(child=p4, title="Negative - Art")
+if tabs_not_grid: tab4 = Panel(child=p4, title="Disliked Art")
 
 ## ---------------------------------
 output_file("wiki_artles_mis.html", title="wiki art example")
 
 ##show(p) # show the plot
 
+if tabs_not_grid:
+    tabs = Tabs(tabs=[ tab1, tab2, tab3, tab4])
+    show(tabs)
+else:
+    show(column(row(p1,p3), row(p2,p4)))
 
-
-#####
-##tabs = Tabs(tabs=[ tab1])
-tabs = Tabs(tabs=[ tab1, tab2, tab3, tab4])
-
-show(tabs)
 
