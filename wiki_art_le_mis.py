@@ -12,7 +12,7 @@ This was the initial code example we worked off of: https://docs.bokeh.org/en/la
 '''
 
 # Load Dataset
-all_data_frame = pd.read_csv('../WikiArtClean.csv') # leave for all
+all_data_frame = pd.read_csv('WikiArtClean.csv') # leave for all
 
 # positive only data
 pos_data_frame = all_data_frame.loc[all_data_frame['Mean rating'] > 0.5]
