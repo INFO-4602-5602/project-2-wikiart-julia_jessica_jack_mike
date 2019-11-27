@@ -59,7 +59,7 @@ colors1 = factor_cmap('style', palette=['#68affc','#81ba5f','#41bbc5','#9c3b68',
 #colors1 = ['#68affc','#422838','#41bbc5','#9c3b68','#81ba5f','#691b9e']
 
 p1 = figure(plot_width=1500, plot_height=1000, tooltips=TOOLTIPS,
-           title="Test graph please ignore", lod_threshold=None)
+           title="The Likeability of Art across Time and Style", lod_threshold=None)
 
 p1.circle('x', 'y', size=6, source=source, fill_color=colors1, line_color=colors1, legend=colors1)
 
@@ -91,7 +91,7 @@ tab1 = Panel(child=p1, title="By Art Style")
 colors2 = factor_cmap('bodyparts', palette=['#ffc428','#bd0026','#46bdb3'], factors=bodyparts.unique())
 
 p2 = figure(plot_width=1500, plot_height=1000, tooltips=TOOLTIPS,
-           title="Test graph please ignore", lod_threshold=None)
+           title="The Likeability of Art across Time and Subject Matter", lod_threshold=None)
 
 p2.circle('x', 'y', size=6, source=source, fill_color=colors2, line_color=colors2, legend=colors2)
 
