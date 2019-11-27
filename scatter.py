@@ -11,6 +11,9 @@ output_file("scatter.html")
 
 # Load Dataset
 data_frame = pd.read_csv('WikiArtClean.csv',encoding='utf_8')
+data_frame.replace('face', 'Contains a face', inplace = True)
+data_frame.replace('body', 'Contains a human but no face', inplace = True)
+data_frame.replace('none', 'Contains neither', inplace = True)
 
 # Grab sub frames for color mapping
 style = data_frame['Style']
