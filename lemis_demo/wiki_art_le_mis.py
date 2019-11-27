@@ -3,24 +3,12 @@ from bokeh.plotting import figure, show, output_file
 from bokeh.sampledata.les_mis import data
 import pandas as pd
 from bokeh.models.widgets import Panel, Tabs
-from bokeh.models import (Legend, LegendItem)
+from bokeh.models import Legend, LegendItem, Title
 from bokeh.layouts import column, row
 
 '''
 Citations:
 This was the initial code example we worked off of: https://docs.bokeh.org/en/latest/docs/gallery/les_mis.html
-'''
-
-## my notes on what's up next
-'''
-- color legends, one for hue and one for intensity
-- DONE center vals should be blank
-- DONE Title
-- DONE tab names: Liked and Disliked
-- DONE 3 color scheme
-- DONE tool tip, change name to "Co-occurring Emotions"
-and count to "Number of Paintings"
-- DONE add a citation in the code
 '''
 
 # Load Dataset
@@ -208,15 +196,15 @@ colors = [Multi_positive,Multi_neutral,Multi_negative,not_used,'#FFFFFF','#FFFFF
 
 # ---------- generate plot for ALL data
 p1_data = gen_data(all_data_frame, Occurance_Not_Mean_Like)
-if Occurance_Not_Mean_Like: p1title = 'Emotions --- shaded by co-occurance -- Showing all Art'
-else: p1title = 'Emotions --- shaded by mean like -- All data'
-
 
 # generate the first plot tab
-p1 = figure(title=p1title,
-           x_axis_location="above", tools="hover,save",
+p1 = figure(x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
            tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
+
+p1.add_layout(Title(text="Showing all Art", text_font_style="italic"), 'above')
+p1.add_layout(Title(text="Exploring the Relationship Between Emotions and Likeability", text_font_size="12pt"), 'above')
+
 p1.plot_width = 1000
 p1.plot_height = 800
 p1.grid.grid_line_color = None
@@ -247,14 +235,15 @@ if tabs_not_grid: tab1 = Panel(child=p1, title="All Art")
 
 # ---------- generate plot for Positive data
 p2_data = gen_data(pos_data_frame, Occurance_Not_Mean_Like)
-if Occurance_Not_Mean_Like: p2title = 'Emotions --- shaded by co-occurance -- Filtered by only liked Art'
-else: p2title = 'Emotions --- shaded by mean like -- Positive data'
 
 # generate the first plot tab
-p2 = figure(title=p2title,
-           x_axis_location="above", tools="hover,save",
+p2 = figure(x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
            tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
+
+p2.add_layout(Title(text="Filtered by only liked Art", text_font_style="italic"), 'above')
+p2.add_layout(Title(text="Exploring the Relationship Between Emotions and Likeability", text_font_size="12pt"), 'above')
+
 p2.plot_width = 1000
 p2.plot_height = 800
 p2.grid.grid_line_color = None
@@ -281,13 +270,16 @@ if tabs_not_grid: tab2 = Panel(child=p2, title="Liked Art")
 
 # ---------- generate plot for Neutral/mixed data
 p3_data = gen_data(neut_data_frame, Occurance_Not_Mean_Like)
-if Occurance_Not_Mean_Like: p3title = 'Emotions --- shaded by co-occurance -- Filtered by only neutral/mixed Art'
-else: p3title = 'Emotions --- shaded by mean like -- Neutral/mixed data'
+
+
 # generate the first plot tab
-p3 = figure(title=p3title,
-           x_axis_location="above", tools="hover,save",
+p3 = figure(x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
            tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
+
+p3.add_layout(Title(text="Filtered by only neutral/mixed Art", text_font_style="italic"), 'above')
+p3.add_layout(Title(text="Exploring the Relationship Between Emotions and Likeability", text_font_size="12pt"), 'above')
+
 p3.plot_width = 1000
 p3.plot_height = 800
 p3.grid.grid_line_color = None
@@ -312,13 +304,15 @@ if tabs_not_grid: tab3 = Panel(child=p3, title="Neutral/Mixed Art")
 
 # ---------- generate plot for Negative data
 p4_data = gen_data(neg_data_frame, Occurance_Not_Mean_Like)
-if Occurance_Not_Mean_Like: p4title = 'Emotions --- shaded by co-occurance -- Filtered by only disliked Art'
-else: p4title = 'Emotions --- shaded by mean like -- Negative data'
+
 # generate the first plot tab
-p4 = figure(title=p4title,
-           x_axis_location="above", tools="hover,save",
+p4 = figure(x_axis_location="above", tools="hover,save",
            x_range=list(reversed(things)), y_range=things,
            tooltips = [('Co-occurring Emotions', '@yname, @xname'), ('Number of Paintings', '@count')])
+
+p4.add_layout(Title(text="Filtered by only disliked Art", text_font_style="italic"), 'above')
+p4.add_layout(Title(text="Exploring the Relationship Between Emotions and Likeability", text_font_size="12pt"), 'above')
+
 p4.plot_width = 1000
 p4.plot_height = 800
 p4.grid.grid_line_color = None
@@ -341,7 +335,7 @@ p4.rect('xname', 'yname', 0.9, 0.9, source=p4_data,
 if tabs_not_grid: tab4 = Panel(child=p4, title="Disliked Art")
 
 ## ---------------------------------
-output_file("wiki_artles_mis.html", title="wiki art example")
+output_file("wiki_art_emotions_adjacency.html", title="wiki art project 2 vis")
 
 ##show(p) # show the plot
 
