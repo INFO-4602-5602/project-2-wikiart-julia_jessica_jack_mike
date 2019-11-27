@@ -89,7 +89,7 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
     ##            wiki_vals[row, col, OCCUR] = weighted_occ
                 wiki_vals[row, col, MEANLIKE] = mean_like
 
-    Single_ramp = True # color scheme
+    Single_ramp = False # color scheme
     row_max_occur = wiki_vals[:,:,OCCUR].max(0) # per column
     row_min_occur = wiki_vals[:,:,OCCUR].min(0) 
     row_max_like = wiki_vals[:,:,MEANLIKE].max(0) 
@@ -200,7 +200,7 @@ def gen_data(data_frame_L, Occurance_Not_Mean_Like):
 
     return data
 
-tabs_not_grid = False
+tabs_not_grid = True
 Occurance_Not_Mean_Like = True
 # ---------- generate plot for ALL data
 p1_data = gen_data(all_data_frame, Occurance_Not_Mean_Like)
